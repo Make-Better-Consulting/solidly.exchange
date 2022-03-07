@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Paper, Typography, Button, CircularProgress, InputAdornment, TextField, MenuItem, Select, Grid } from '@material-ui/core';
+import { Paper, Typography, Button, CircularProgress, InputAdornment, TextField, MenuItem, Select, Grid,Checkbox } from '@material-ui/core';
 import BigNumber from 'bignumber.js';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import SearchIcon from '@material-ui/icons/Search';
@@ -15,10 +15,32 @@ import { ACTIONS } from '../../stores/constants';
 
 export default function ssVotes() {
   const router = useRouter()
+  const getLocalToggles = () => {
+    let localToggles = {
+      toggleActive: true,
+      toggleActiveGauge: true,
+      toggleVariable: true,
+      toggleStable: true
+    }
+    // get locally saved toggles
+    try {
+      const localToggleString = localStorage.getItem('solidly-pairsToggle-v1')
+      if(localToggleString && localToggleString.length > 0) {
+        localToggles = JSON.parse(localToggleString)
+      }
+    } catch(ex) {
+      console.log(ex)
+    }
+  
+    return localToggles
+  }
+  const onToggle = (event) => {
+   setToggleActive(!toggleActive)
+  }
 
   const [, updateState] = useState();
   const forceUpdate = useCallback(() => updateState({}), []);
-
+  const localToggles = getLocalToggles()
   const [ gauges, setGauges ] = useState([])
   const [ voteLoading, setVoteLoading ] = useState(false)
   const [ votes, setVotes ] = useState([])
@@ -26,6 +48,7 @@ export default function ssVotes() {
   const [ token, setToken ] = useState(null)
   const [ vestNFTs, setVestNFTs ] = useState([])
   const [search, setSearch] = useState('');
+  const [toggleActive, setToggleActive] = useState(true);
 
 
   const ssUpdated = () => {
@@ -160,11 +183,10 @@ export default function ssVotes() {
   }
 
   return (
-    <div className={ classes.container }>
-      <div className={ classes.topBarContainer }>
-
+    <div className={classes.container}>
+      <div className={classes.topBarContainer}>
         <Grid container spacing={1}>
-          <Grid item lg='auto' lg='auto' sm={12} xs={12}>
+          <Grid item lg="auto" lg="auto" sm={12} xs={12}>
             {/*
               <Button
                 variant="contained"
@@ -197,50 +219,94 @@ export default function ssVotes() {
               }}
             />
           </Grid>
-          <Grid item lg='auto' lg='auto' sm={12} xs={12}>
-            <div className={ classes.tokenIDContainer }>
-              { renderMediumInput(token, vestNFTs) }
+          <Grid item lg="auto" lg="auto" sm={12} xs={12}>
+            <div className={classes.tokenIDContainer}>
+              {renderMediumInput(token, vestNFTs)}
             </div>
           </Grid>
         </Grid>
+        <Grid  md={2} xs={12} container style={{display: 'flex',justifyContent: 'center',alignItems: 'center'}}>
+          <Grid item lg={9} className={classes.labelColumn}>
+            <Typography  variant="body1">
+              My Votes Only
+            </Typography>
+          </Grid>
+          <Grid item lg={3} className={classes.alignContentRight}>
+            <Checkbox
+              color="primary"
+              checked={toggleActive}
+              name={"toggleActive"}
+              onChange={onToggle}
+            />
+          </Grid>
+        </Grid>
       </div>
-      <Paper elevation={0} className={ classes.tableContainer }>
-        <GaugesTable gauges={ gauges.filter((pair) => {
-          if(!search || search === '') {
-            return true
-          }
 
-          const searchLower = search.toLowerCase()
+      <Paper elevation={0} className={classes.tableContainer}>
+        <GaugesTable
+          gauges={gauges.filter((pair) => {
+            if (!search || search === "") {
+              return true;
+            }
 
-          if(pair.symbol.toLowerCase().includes(searchLower) || pair.address.toLowerCase().includes(searchLower) ||
-            pair.token0.symbol.toLowerCase().includes(searchLower) || pair.token0.address.toLowerCase().includes(searchLower) || pair.token0.name.toLowerCase().includes(searchLower) ||
-            pair.token1.symbol.toLowerCase().includes(searchLower) || pair.token1.address.toLowerCase().includes(searchLower) ||  pair.token1.name.toLowerCase().includes(searchLower)) {
-            return true
-          }
+            const searchLower = search.toLowerCase();
 
-          return false
+            if (
+              pair.symbol.toLowerCase().includes(searchLower) ||
+              pair.address.toLowerCase().includes(searchLower) ||
+              pair.token0.symbol.toLowerCase().includes(searchLower) ||
+              pair.token0.address.toLowerCase().includes(searchLower) ||
+              pair.token0.name.toLowerCase().includes(searchLower) ||
+              pair.token1.symbol.toLowerCase().includes(searchLower) ||
+              pair.token1.address.toLowerCase().includes(searchLower) ||
+              pair.token1.name.toLowerCase().includes(searchLower)
+            ) {
+              return true;
+            }
 
-        }) } setParentSliderValues={setVotes} defaultVotes={votes} veToken={veToken} token={ token } />
+            return false;
+          })}
+          setParentSliderValues={setVotes}
+          defaultVotes={votes}
+          veToken={veToken}
+          token={token}
+        />
       </Paper>
-      <Paper elevation={10} className={ classes.actionButtons }>
+      <Paper elevation={10} className={classes.actionButtons}>
         <Grid container spacing={2}>
           <Grid item lg={6}>
-            <div className={ classes.infoSection }>
+            <div className={classes.infoSection}>
               <Typography>Voting Power Used: </Typography>
-              <Typography className={ `${BigNumber(totalVotes).gt(100) ? classes.errorText : classes.helpText}` }>{ totalVotes } %</Typography>
+              <Typography
+                className={`${
+                  BigNumber(totalVotes).gt(100)
+                    ? classes.errorText
+                    : classes.helpText
+                }`}
+              >
+                {totalVotes} %
+              </Typography>
             </div>
           </Grid>
           <Grid item lg={6}>
             <Button
-              className={ classes.buttonOverrideFixed }
-              variant='contained'
-              size='large'
-              color='primary'
-              disabled={ voteLoading || BigNumber(totalVotes).eq(0) || BigNumber(totalVotes).gt(100) }
-              onClick={ onVote }
-              >
-              <Typography className={ classes.actionButtonText }>{ voteLoading ? `Casting Votes` : `Cast Votes` }</Typography>
-              { voteLoading && <CircularProgress size={10} className={ classes.loadingCircle } /> }
+              className={classes.buttonOverrideFixed}
+              variant="contained"
+              size="large"
+              color="primary"
+              disabled={
+                voteLoading ||
+                BigNumber(totalVotes).eq(0) ||
+                BigNumber(totalVotes).gt(100)
+              }
+              onClick={onVote}
+            >
+              <Typography className={classes.actionButtonText}>
+                {voteLoading ? `Casting Votes` : `Cast Votes`}
+              </Typography>
+              {voteLoading && (
+                <CircularProgress size={10} className={classes.loadingCircle} />
+              )}
             </Button>
           </Grid>
         </Grid>

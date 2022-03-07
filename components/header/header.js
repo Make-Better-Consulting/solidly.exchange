@@ -217,11 +217,13 @@ function Header(props) {
   }
 
   const switchChain = async () => {
-    let hexChain = '0x'+Number(process.env.NEXT_PUBLIC_CHAINID).toString(16)
+    //let hexChain = '0x'+Number(process.env.NEXT_PUBLIC_CHAINID).toString(16)
+   
+   
     try {
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: hexChain }],
+        params: [{ chainId: "0x323530" }],
       });
     } catch (switchError) {
       console.log("switch error",switchError)

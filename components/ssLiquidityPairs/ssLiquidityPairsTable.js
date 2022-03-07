@@ -22,7 +22,9 @@ import {
   Popper,
   Fade,
   Grid,
-  Switch
+  Switch,
+  Box,
+  Checkbox 
 } from '@material-ui/core';
 import { useRouter } from "next/router";
 import BigNumber from 'bignumber.js';
@@ -408,6 +410,19 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: '0 10px 20px 0 rgba(0,0,0,0.2)',
     border: '1px solid rgba(126,153,176,0.2)',
   },
+  toolbar:{
+    width:'100%',
+    display: 'flex',
+    flexDirection:"column",
+    justifyContent:'center',
+    alignItems: 'center',
+  },
+  myDeposits:{
+    width:'100%',
+    flexDirection:"row",
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   alignContentRight: {
     textAlign: 'right',
   },
@@ -538,6 +553,7 @@ const EnhancedTableToolbar = (props) => {
   const id = open ? 'transitions-popper' : undefined;
 
   return (
+    <Box className={classes.toolbar}>
     <Toolbar className={ classes.toolbar }>
 
     <Grid container spacing={2}>
@@ -585,22 +601,6 @@ const EnhancedTableToolbar = (props) => {
           <Fade {...TransitionProps} timeout={350}>
             <div className={classes.filterContainer}>
               <Typography className={classes.filterListTitle} variant="h5">List Filters</Typography>
-
-
-              <Grid container spacing={0}>
-                <Grid item lg={9} className={classes.labelColumn}>
-                  <Typography className={classes.filterLabel} variant="body1">My Deposits</Typography>
-                </Grid>
-                <Grid item lg={3} className={classes.alignContentRight}>
-                  <Switch
-                    color="primary"
-                    checked={ toggleActive }
-                    name={ 'toggleActive' }
-                    onChange={ onToggle }
-                  />
-                </Grid>
-              </Grid>
-
               <Grid container spacing={0}>
                 <Grid item lg={9} className={classes.labelColumn}>
                   <Typography className={classes.filterLabel} variant="body1">Show Active Gauges</Typography>
@@ -648,7 +648,22 @@ const EnhancedTableToolbar = (props) => {
           </Fade>
         )}
       </Popper>
+      
     </Toolbar>
+    <Grid container  md={2} xs={12} className={classes.myDeposits}>
+                <Grid item lg={9} className={classes.labelColumn}>
+                  <Typography  variant="body1">My Deposits Only</Typography>
+                </Grid>
+                <Grid item lg={3} className={classes.alignContentRight}>
+                  <Checkbox
+                    color="primary"
+                    checked={ toggleActive }
+                    name={ 'toggleActive' }
+                    onChange={ onToggle }
+                  />
+                </Grid>
+      </Grid>
+    </Box>
   );
 };
 
