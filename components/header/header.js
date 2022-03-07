@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/router";
-
+import Web3 from "web3"
 import { Typography, Switch, Button, SvgIcon, Badge, IconButton, Menu, MenuItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import HelpIcon from '@material-ui/icons/Help';
@@ -8,7 +8,6 @@ import ListIcon from '@material-ui/icons/List';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
-
 import Navigation from '../navigation'
 import Unlock from '../unlock';
 import TransactionQueue from '../transactionQueue';
@@ -217,13 +216,13 @@ function Header(props) {
   }
 
   const switchChain = async () => {
-    //let hexChain = '0x'+Number(process.env.NEXT_PUBLIC_CHAINID).toString(16)
+    let hexChain = Web3.utils.utf8ToHex(process.env.NEXT_PUBLIC_CHAINID)
    
    
     try {
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: "0x323530" }],
+        params: [{ chainId: `${hexChain}` }],
       });
     } catch (switchError) {
       console.log("switch error",switchError)
